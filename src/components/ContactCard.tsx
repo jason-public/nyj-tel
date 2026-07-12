@@ -58,6 +58,9 @@ END:VCARD`;
 
   const EmployeeRow = ({ emp }: { emp: Employee }) => {
     const isFav = favorites.includes(emp.id);
+    
+    const formattedExt = emp.ext ? (/^\d{4}$/.test(emp.ext) ? `031-590-${emp.ext}` : emp.ext) : "";
+
     return (
       <div className="flex items-center justify-between p-4 bg-slate-50/50 rounded-xl border border-slate-100 hover:border-teal-100 transition-colors group">
         <div className="flex-1 min-w-0">
@@ -75,8 +78,8 @@ END:VCARD`;
           <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-sm text-slate-500 mt-1">
             <div className="flex items-center gap-1.5 whitespace-nowrap">
               <span className="text-[11px] sm:text-xs bg-slate-200 px-1.5 py-0.5 rounded shrink-0">내선</span>
-              {emp.ext ? (
-                <a href={`tel:${emp.ext}`} className="text-xs sm:text-sm truncate text-teal-600 hover:underline">{emp.ext}</a>
+              {formattedExt ? (
+                <a href={`tel:${formattedExt.replace(/-/g, '')}`} className="text-xs sm:text-sm truncate text-teal-600 hover:underline">{formattedExt}</a>
               ) : (
                 <span className="text-xs sm:text-sm truncate">-</span>
               )}

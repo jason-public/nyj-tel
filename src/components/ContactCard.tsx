@@ -11,7 +11,7 @@ interface ContactCardProps {
 }
 
 export default function ContactCard({ department }: ContactCardProps) {
-  const [activeTab, setActiveTab] = useState<"head" | "teams">("head");
+  const [isTeamPopupOpen, setIsTeamPopupOpen] = useState(false);
   const [qrPhone, setQrPhone] = useState<string | null>(null);
   
   const favorites = useStore((state) => state.favorites);
@@ -132,64 +132,22 @@ END:VCARD`;
         </div>
 
         <div className="p-4">
-          <div className="flex bg-slate-100 p-1 rounded-xl mb-4">
-            <button
-              onClick={() => setActiveTab("head")}
-              className={cn(
-                "flex-1 flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg transition-all",
-                activeTab === "head" ? "bg-white text-slate-800 shadow-sm" : "text-slate-500 hover:text-slate-700"
-              )}
-            >
-              <LayoutGrid className="w-4 h-4" />
-              부서장
-            </button>
-            <button
-              onClick={() => setActiveTab("teams")}
-              className={cn(
-                "flex-1 flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg transition-all",
-                activeTab === "teams" ? "bg-white text-slate-800 shadow-sm" : "text-slate-500 hover:text-slate-700"
-              )}
-            >
-              <List className="w-4 h-4" />
-              팀장 목록
-            </button>
-          </div>
-
           <div className="min-h-[120px]">
-            <AnimatePresence mode="wait">
-              {activeTab === "head" ? (
-                <motion.div
-                  key="head"
-                  initial={{ opacity: 0, y: 5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -5 }}
-                  transition={{ duration: 0.15 }}
-                >
-                  {department.head ? (
-                    <EmployeeRow emp={department.head} />
-                  ) : (
-                    <div className="text-center py-8 text-slate-400 text-sm">부서장 정보가 없습니다.</div>
-                  )}
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="teams"
-                  initial={{ opacity: 0, y: 5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -5 }}
-                  transition={{ duration: 0.15 }}
-                  className="space-y-3"
-                >
-                  {department.teams.length > 0 ? (
-                    department.teams.map((team, idx) => 
-                      team.leader ? <EmployeeRow key={idx} emp={team.leader} /> : null
-                    )
-                  ) : (
-                    <div className="text-center py-8 text-slate-400 text-sm">팀장 정보가 없습니다.</div>
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
+            {department.head ? (
+              <EmployeeRow emp={department.head} />
+            ) : (
+              <div className="text-center py-8 text-slate-400 text-sm">부서장 정보가 없습니다.</div>
+            )}
+            
+            {department.teams.length > 0 && (
+              <button
+                onClick={() => setIsTeamPopupOpen(true)}
+                className="w-full mt-3 flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-teal-600 bg-teal-50 rounded-lg hover:bg-teal-100 transition-colors"
+              >
+                <List className="w-4 h-4" />
+                팀장 목록 보기
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -218,6 +176,38 @@ END:VCARD`;
                 <div className="mt-4 font-mono font-medium text-slate-700 bg-white px-4 py-2 rounded-lg border border-slate-200">
                   {qrPhone}
                 </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+      {/* Team Leaders Modal */}
+      <AnimatePresence>
+        {isTeamPopupOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-white rounded-2xl shadow-xl max-w-lg w-full max-h-[80vh] flex flex-col"
+            >
+              <div className="flex justify-between items-center p-5 border-b border-slate-100">
+                <h3 className="font-semibold text-slate-800 text-lg flex items-center gap-2">
+                  <List className="w-5 h-5 text-teal-600" />
+                  {department.deptName} 팀장 목록
+                </h3>
+                <button onClick={() => setIsTeamPopupOpen(false)} className="text-slate-400 hover:text-slate-600 p-1 rounded-full hover:bg-slate-100 transition-colors">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="p-5 overflow-y-auto custom-scrollbar space-y-3 flex-1">
+                {department.teams.length > 0 ? (
+                  department.teams.map((team, idx) => 
+                    team.leader ? <EmployeeRow key={idx} emp={team.leader} /> : null
+                  )
+                ) : (
+                  <div className="text-center py-8 text-slate-400 text-sm">팀장 정보가 없습니다.</div>
+                )}
               </div>
             </motion.div>
           </div>

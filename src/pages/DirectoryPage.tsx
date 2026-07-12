@@ -1,8 +1,9 @@
 import { useState, useMemo, useEffect } from "react";
 import { useStore } from "../store/useStore";
-import { Search, Mic, MicOff } from "lucide-react";
+import { Search, Mic, MicOff, ChevronDown, ChevronUp } from "lucide-react";
 import ContactCard from "../components/ContactCard";
 import { getChosung } from "../lib/utils";
+import { motion, AnimatePresence } from "motion/react";
 
 // Types for Web Speech API
 declare global {
@@ -17,6 +18,7 @@ export default function DirectoryPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isListening, setIsListening] = useState(false);
   const [selectedOrg, setSelectedOrg] = useState<string>("전체");
+  const [expandedOrgs, setExpandedOrgs] = useState<Record<string, boolean>>({});
 
   const orgNames = useMemo(() => {
     const orgs = new Set<string>();
@@ -169,18 +171,55 @@ export default function DirectoryPage() {
 
       <div className="space-y-12">
         {groupedDepartments.length > 0 ? (
-          groupedDepartments.map(([org, depts]) => (
-            <div key={org} id={`org-${org}`} className="scroll-mt-[140px]">
-              <h2 className="text-xl font-bold text-slate-800 mb-6 pb-2 border-b border-slate-200">
-                {org}
-              </h2>
-              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                {depts.map((dept) => (
-                  <ContactCard key={dept.id} department={dept} />
-                ))}
+          groupedDepartments.map(([org, depts]) => {
+            const isSpecial = org === "시장" || org === "부시장";
+            const isExpanded = isSpecial ? expandedOrgs[org] : true;
+
+            const toggleExpand = () => {
+              if (isSpecial) {
+                setExpandedOrgs(prev => ({ ...prev, [org]: !prev[org] }));
+              }
+            };
+
+            return (
+              <div key={org} id={`org-${org}`} className="scroll-mt-[140px]">
+                {isSpecial ? (
+                  <button
+                    onClick={toggleExpand}
+                    className="w-full flex items-center justify-between text-left p-4 mb-6 bg-white rounded-xl border border-slate-200 shadow-sm hover:border-teal-300 transition-all group"
+                  >
+                    <h2 className="text-xl font-bold text-slate-800">{org}</h2>
+                    <div className="p-2 rounded-full bg-slate-50 group-hover:bg-teal-50 transition-colors">
+                      {isExpanded ? <ChevronUp className="w-5 h-5 text-slate-500 group-hover:text-teal-600" /> : <ChevronDown className="w-5 h-5 text-slate-500 group-hover:text-teal-600" />}
+                    </div>
+                  </button>
+                ) : (
+                  <h2 className="text-xl font-bold text-slate-800 mb-6 pb-2 border-b border-slate-200">
+                    {org}
+                  </h2>
+                )}
+                
+                <AnimatePresence initial={false}>
+                  {(!isSpecial || isExpanded) && (
+                    <motion.div 
+                      key="content"
+                      initial={isSpecial ? { height: 0, opacity: 0 } : false}
+                      animate={isSpecial ? { height: "auto", opacity: 1 } : false}
+                      exit={isSpecial ? { height: 0, opacity: 0 } : false}
+                      transition={{ duration: 0.2 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 pb-2">
+                        {depts.map((dept) => (
+                          <ContactCard key={dept.id} department={dept} />
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
-            </div>
-          ))
+            );
+          })
         ) : (
           <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-slate-300">
             <p className="text-slate-500">검색 결과가 없습니다.</p>

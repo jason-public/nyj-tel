@@ -8,9 +8,10 @@ import { motion, AnimatePresence } from "motion/react";
 
 interface ContactCardProps {
   department: Department;
+  isSearch?: boolean;
 }
 
-export default function ContactCard({ department }: ContactCardProps) {
+export default function ContactCard({ department, isSearch }: ContactCardProps) {
   const [isTeamPopupOpen, setIsTeamPopupOpen] = useState(false);
   const [qrPhone, setQrPhone] = useState<string | null>(null);
   
@@ -135,18 +136,28 @@ END:VCARD`;
           <div className="min-h-[120px]">
             {department.head ? (
               <EmployeeRow emp={department.head} />
-            ) : (
-              <div className="text-center py-8 text-slate-400 text-sm">부서장 정보가 없습니다.</div>
+            ) : null}
+            
+            {!department.head && department.teams.length === 0 && (
+              <div className="text-center py-8 text-slate-400 text-sm">정보가 없습니다.</div>
             )}
             
             {department.teams.length > 0 && (
-              <button
-                onClick={() => setIsTeamPopupOpen(true)}
-                className="w-full mt-3 flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-teal-600 bg-teal-50 rounded-lg hover:bg-teal-100 transition-colors"
-              >
-                <List className="w-4 h-4" />
-                팀장 목록 보기
-              </button>
+              isSearch ? (
+                <div className="mt-3 space-y-3">
+                  {department.teams.map((team, idx) => 
+                    team.leader ? <EmployeeRow key={idx} emp={team.leader} /> : null
+                  )}
+                </div>
+              ) : (
+                <button
+                  onClick={() => setIsTeamPopupOpen(true)}
+                  className="w-full mt-3 flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-teal-600 bg-teal-50 rounded-lg hover:bg-teal-100 transition-colors"
+                >
+                  <List className="w-4 h-4" />
+                  팀장 목록 보기
+                </button>
+              )
             )}
           </div>
         </div>

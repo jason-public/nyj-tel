@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { useStore } from "../store/useStore";
-import { Search, Mic, MicOff, ChevronDown, ChevronUp } from "lucide-react";
+import { Search, Mic, MicOff, ChevronDown, ChevronUp, ArrowUp } from "lucide-react";
 import ContactCard from "../components/ContactCard";
 import { getChosung } from "../lib/utils";
 import { motion, AnimatePresence } from "motion/react";
@@ -19,6 +19,19 @@ export default function DirectoryPage() {
   const [isListening, setIsListening] = useState(false);
   const [selectedOrg, setSelectedOrg] = useState<string>("전체");
   const [expandedOrgs, setExpandedOrgs] = useState<Record<string, boolean>>({});
+  const [showTopBtn, setShowTopBtn] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 400) {
+        setShowTopBtn(true);
+      } else {
+        setShowTopBtn(false);
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const orgNames = useMemo(() => {
     const orgs = new Set<string>();
@@ -67,7 +80,7 @@ export default function DirectoryPage() {
     const query = searchQuery.toLowerCase().replace(/\s+/g, "");
     const isChosungQuery = /^[ㄱ-ㅎ]+$/.test(query);
 
-    return departments.filter(dept => {
+    return departments.map(dept => {
       const matchString = (target: string) => {
         if (!target) return false;
         const normalizedTarget = target.toLowerCase().replace(/\s+/g, "");
@@ -77,24 +90,26 @@ export default function DirectoryPage() {
         return normalizedTarget.includes(query);
       };
 
-      // Search org name, dept name
-      if (matchString(dept.orgName) || matchString(dept.deptName)) return true;
-
-      // Search head
-      if (dept.head) {
-        if (matchString(dept.head.name) || matchString(dept.head.rank) || matchString(dept.head.ext)) return true;
-      }
+      const orgMatches = matchString(dept.orgName) || matchString(dept.deptName);
+      const headMatches = dept.head ? (matchString(dept.head.name) || matchString(dept.head.rank) || matchString(dept.head.ext) || matchString(dept.head.phone)) : false;
+      const deptMatches = orgMatches || headMatches;
 
       // Search teams
-      for (const team of dept.teams) {
-        if (matchString(team.teamName)) return true;
-        if (team.leader) {
-          if (matchString(team.leader.name) || matchString(team.leader.rank) || matchString(team.leader.ext)) return true;
-        }
+      const matchingTeams = dept.teams.filter(team => {
+        return matchString(team.teamName) ||
+               (team.leader && (matchString(team.leader.name) || matchString(team.leader.rank) || matchString(team.leader.ext) || matchString(team.leader.phone)));
+      });
+
+      if (deptMatches || matchingTeams.length > 0) {
+        return {
+          ...dept,
+          head: dept.head, // Always keep head for context
+          teams: orgMatches ? dept.teams : matchingTeams
+        };
       }
 
-      return false;
-    });
+      return null;
+    }).filter(Boolean) as typeof departments;
   }, [departments, searchQuery]);
 
   // Group by orgName
@@ -121,6 +136,10 @@ export default function DirectoryPage() {
       const y = element.getBoundingClientRect().top + window.scrollY - 100; // Offset for header
       window.scrollTo({ top: y, behavior: "smooth" });
     }
+  };
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
@@ -151,21 +170,22 @@ export default function DirectoryPage() {
         </button>
       </div>
 
-      <div className="mb-8 overflow-x-auto custom-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0 sticky top-[72px] z-10 bg-slate-50/80 backdrop-blur">
-        <div className="flex gap-2 min-w-max">
-          {orgNames.map((org) => (
-            <button
-              key={org}
-              onClick={() => scrollToOrg(org)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                selectedOrg === org
-                  ? "bg-teal-600 text-white shadow-sm"
-                  : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
-              }`}
-            >
-              {org}
-            </button>
-          ))}
+      <div className="mb-8">
+        <div className="relative max-w-sm">
+          <select
+            value={selectedOrg}
+            onChange={(e) => scrollToOrg(e.target.value)}
+            className="w-full appearance-none bg-white border border-slate-200 text-slate-700 py-2.5 px-4 pr-10 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 font-medium"
+          >
+            {orgNames.map((org) => (
+              <option key={org} value={org}>
+                {org}
+              </option>
+            ))}
+          </select>
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
+            <ChevronDown className="h-4 w-4" />
+          </div>
         </div>
       </div>
 
@@ -211,7 +231,7 @@ export default function DirectoryPage() {
                     >
                       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 pb-2">
                         {depts.map((dept) => (
-                          <ContactCard key={dept.id} department={dept} />
+                          <ContactCard key={dept.id} department={dept} isSearch={!!searchQuery.trim()} />
                         ))}
                       </div>
                     </motion.div>
@@ -226,6 +246,20 @@ export default function DirectoryPage() {
           </div>
         )}
       </div>
+
+      <AnimatePresence>
+        {showTopBtn && (
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            onClick={scrollToTop}
+            className="fixed bottom-6 right-6 p-3 bg-slate-800 text-white rounded-full shadow-lg hover:bg-slate-700 transition-colors z-50 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2"
+          >
+            <ArrowUp className="w-5 h-5" />
+          </motion.button>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

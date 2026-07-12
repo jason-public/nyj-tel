@@ -1,9 +1,11 @@
 import { useState, useMemo, useEffect } from "react";
 import { useStore } from "../store/useStore";
-import { Search, Mic, MicOff, ChevronDown, ChevronUp, ArrowUp } from "lucide-react";
+import { Search, Mic, MicOff, ChevronDown, ChevronUp, ArrowUp, LayoutGrid, ListTree, X } from "lucide-react";
 import ContactCard from "../components/ContactCard";
+import TreeView from "../components/TreeView";
 import { getChosung } from "../lib/utils";
 import { motion, AnimatePresence } from "motion/react";
+import { Department } from "../types";
 
 // Types for Web Speech API
 declare global {
@@ -20,6 +22,8 @@ export default function DirectoryPage() {
   const [selectedOrg, setSelectedOrg] = useState<string>("전체");
   const [expandedOrgs, setExpandedOrgs] = useState<Record<string, boolean>>({});
   const [showTopBtn, setShowTopBtn] = useState(false);
+  const [viewMode, setViewMode] = useState<'accordion' | 'tree'>('accordion');
+  const [selectedDeptForModal, setSelectedDeptForModal] = useState<Department | null>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -143,7 +147,7 @@ export default function DirectoryPage() {
   };
 
   return (
-    <div className="p-4 md:p-8 max-w-7xl mx-auto w-full">
+    <div className="p-4 md:p-8 max-w-[1600px] mx-auto w-full">
       <div className="mb-8">
         <h1 className="text-2xl md:text-3xl font-bold text-slate-800 mb-2">통합 조직도</h1>
         <p className="text-slate-500">부서, 이름, 업무 등을 검색해보세요. 초성 검색도 지원합니다.</p>
@@ -158,6 +162,10 @@ export default function DirectoryPage() {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="검색어 입력 (예: 김상수, 시민안전관, ㄱㅅㅅ)"
+          spellCheck={false}
+          autoCorrect="off"
+          autoCapitalize="off"
+          autoComplete="off"
           className="block w-full pl-11 pr-12 py-4 bg-white border border-slate-200 rounded-2xl shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-shadow text-lg"
         />
         <button
@@ -170,8 +178,8 @@ export default function DirectoryPage() {
         </button>
       </div>
 
-      <div className="mb-8">
-        <div className="relative max-w-sm">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+        <div className="relative w-full max-w-sm">
           <select
             value={selectedOrg}
             onChange={(e) => scrollToOrg(e.target.value)}
@@ -187,51 +195,70 @@ export default function DirectoryPage() {
             <ChevronDown className="h-4 w-4" />
           </div>
         </div>
+
+        <div className="flex bg-slate-100 p-1 rounded-xl shrink-0">
+          <button
+            onClick={() => setViewMode('accordion')}
+            className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${viewMode === 'accordion' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+          >
+            <LayoutGrid className="w-4 h-4" />
+            카드 뷰
+          </button>
+          <button
+            onClick={() => setViewMode('tree')}
+            className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${viewMode === 'tree' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+          >
+            <ListTree className="w-4 h-4" />
+            트리 뷰
+          </button>
+        </div>
       </div>
 
       <div className="space-y-12">
-        {groupedDepartments.length > 0 ? (
+        {viewMode === 'tree' ? (
+          <TreeView groupedDepartments={groupedDepartments} searchQuery={searchQuery} onDeptSelect={setSelectedDeptForModal} />
+        ) : (
+          groupedDepartments.length > 0 ? (
           groupedDepartments.map(([org, depts]) => {
-            const isSpecial = org === "시장" || org === "부시장";
-            const isExpanded = isSpecial ? expandedOrgs[org] : true;
+            const hasSearch = !!searchQuery.trim();
+            const isExpanded = hasSearch ? true : !!expandedOrgs[org];
 
             const toggleExpand = () => {
-              if (isSpecial) {
+              if (!hasSearch) {
                 setExpandedOrgs(prev => ({ ...prev, [org]: !prev[org] }));
               }
             };
 
             return (
               <div key={org} id={`org-${org}`} className="scroll-mt-[140px]">
-                {isSpecial ? (
-                  <button
-                    onClick={toggleExpand}
-                    className="w-full flex items-center justify-between text-left p-4 mb-6 bg-white rounded-xl border border-slate-200 shadow-sm hover:border-teal-300 transition-all group"
-                  >
+                <button
+                  onClick={toggleExpand}
+                  className="w-full flex items-center justify-between text-left p-4 mb-6 bg-white rounded-xl border border-slate-200 shadow-sm hover:border-teal-300 transition-all group"
+                >
+                  <div className="flex items-center gap-3">
                     <h2 className="text-xl font-bold text-slate-800">{org}</h2>
-                    <div className="p-2 rounded-full bg-slate-50 group-hover:bg-teal-50 transition-colors">
-                      {isExpanded ? <ChevronUp className="w-5 h-5 text-slate-500 group-hover:text-teal-600" /> : <ChevronDown className="w-5 h-5 text-slate-500 group-hover:text-teal-600" />}
-                    </div>
-                  </button>
-                ) : (
-                  <h2 className="text-xl font-bold text-slate-800 mb-6 pb-2 border-b border-slate-200">
-                    {org}
-                  </h2>
-                )}
+                    <span className="bg-teal-50 text-teal-600 px-3 py-1 rounded-full text-sm font-medium">
+                      {depts.length}개 부서
+                    </span>
+                  </div>
+                  <div className="p-2 rounded-full bg-slate-50 group-hover:bg-teal-50 transition-colors">
+                    {isExpanded ? <ChevronUp className="w-5 h-5 text-slate-500 group-hover:text-teal-600" /> : <ChevronDown className="w-5 h-5 text-slate-500 group-hover:text-teal-600" />}
+                  </div>
+                </button>
                 
                 <AnimatePresence initial={false}>
-                  {(!isSpecial || isExpanded) && (
+                  {isExpanded && (
                     <motion.div 
                       key="content"
-                      initial={isSpecial ? { height: 0, opacity: 0 } : false}
-                      animate={isSpecial ? { height: "auto", opacity: 1 } : false}
-                      exit={isSpecial ? { height: 0, opacity: 0 } : false}
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
                       transition={{ duration: 0.2 }}
                       className="overflow-hidden"
                     >
-                      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 pb-2">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 pb-2">
                         {depts.map((dept) => (
-                          <ContactCard key={dept.id} department={dept} isSearch={!!searchQuery.trim()} />
+                          <ContactCard key={dept.id} department={dept} isSearch={hasSearch} />
                         ))}
                       </div>
                     </motion.div>
@@ -244,7 +271,7 @@ export default function DirectoryPage() {
           <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-slate-300">
             <p className="text-slate-500">검색 결과가 없습니다.</p>
           </div>
-        )}
+        ))}
       </div>
 
       <AnimatePresence>
@@ -258,6 +285,36 @@ export default function DirectoryPage() {
           >
             <ArrowUp className="w-5 h-5" />
           </motion.button>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {selectedDeptForModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm"
+            onClick={() => setSelectedDeptForModal(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto custom-scrollbar relative"
+            >
+              <button
+                onClick={() => setSelectedDeptForModal(null)}
+                className="absolute top-4 right-4 p-2 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-full transition-colors z-10"
+              >
+                <X className="w-5 h-5" />
+              </button>
+              <div className="p-6">
+                <ContactCard department={selectedDeptForModal} isSearch={true} />
+              </div>
+            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>

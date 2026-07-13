@@ -5,7 +5,6 @@ import Layout from "./components/Layout";
 import AuthScreen from "./pages/AuthScreen";
 import DirectoryPage from "./pages/DirectoryPage";
 import FavoritesPage from "./pages/FavoritesPage";
-import OrgChartPage from "./pages/OrgChartPage";
 import AdminPage from "./pages/AdminPage";
 
 export default function App() {
@@ -25,9 +24,9 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Layout />}>
-          <Route index element={<DirectoryPage />} />
+          <Route index element={<DirectoryPage defaultView="accordion" />} />
           <Route path="favorites" element={<FavoritesPage />} />
-          <Route path="org-chart" element={<OrgChartPage />} />
+          <Route path="tree" element={<DirectoryPage defaultView="tree" />} />
           <Route path="admin" element={<AdminPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>

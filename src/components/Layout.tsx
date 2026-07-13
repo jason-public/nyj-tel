@@ -1,5 +1,5 @@
 import { Outlet, NavLink } from "react-router-dom";
-import { Users, Star, Network, Settings, Building2, Sun, Moon } from "lucide-react";
+import { Users, Star, ListTree, Settings, Building2, Sun, Moon } from "lucide-react";
 import { useStore } from "../store/useStore";
 import GlobalSearch from "./GlobalSearch";
 
@@ -8,7 +8,7 @@ export default function Layout() {
   const navItems = [
     { to: "/", icon: Users, label: "조직도" },
     { to: "/favorites", icon: Star, label: "즐겨찾기" },
-    { to: "/org-chart", icon: Network, label: "마인드맵" },
+    { to: "/tree", icon: ListTree, label: "트리뷰" },
     { to: "/admin", icon: Settings, label: "관리자" },
   ];
 

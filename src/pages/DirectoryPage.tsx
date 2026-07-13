@@ -15,15 +15,19 @@ declare global {
   }
 }
 
-export default function DirectoryPage() {
+export default function DirectoryPage({ defaultView = 'accordion' }: { defaultView?: 'accordion' | 'tree' }) {
   const departments = useStore((state) => state.departments);
   const [searchQuery, setSearchQuery] = useState("");
   const [isListening, setIsListening] = useState(false);
   const [selectedOrg, setSelectedOrg] = useState<string>("전체");
   const [expandedOrgs, setExpandedOrgs] = useState<Record<string, boolean>>({});
   const [showTopBtn, setShowTopBtn] = useState(false);
-  const [viewMode, setViewMode] = useState<'accordion' | 'tree'>('accordion');
+  const [viewMode, setViewMode] = useState<'accordion' | 'tree'>(defaultView);
   const [selectedDeptForModal, setSelectedDeptForModal] = useState<Department | null>(null);
+
+  useEffect(() => {
+    setViewMode(defaultView);
+  }, [defaultView]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -153,7 +157,7 @@ export default function DirectoryPage() {
         <p className="text-slate-500 dark:text-slate-400">부서, 이름, 업무 등을 검색해보세요. 초성 검색도 지원합니다.</p>
       </div>
 
-      <div className="relative mb-6 max-w-2xl">
+      <div className="relative mb-2 max-w-2xl">
         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
           <Search className="h-5 w-5 text-slate-400 dark:text-slate-500" />
         </div>
@@ -161,7 +165,7 @@ export default function DirectoryPage() {
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="검색어 입력 (예: 김상수, 시민안전관, ㄱㅅㅅ)"
+          placeholder="검색어 입력 (예: 유종형, 자동차관리과, ㅇㅈㅎ)"
           spellCheck={false}
           autoCorrect="off"
           autoCapitalize="off"
@@ -177,6 +181,9 @@ export default function DirectoryPage() {
           {isListening ? <MicOff className="h-5 w-5 animate-pulse" /> : <Mic className="h-5 w-5" />}
         </button>
       </div>
+      <p className="text-xs text-slate-500 dark:text-yellow-400 mb-6 pl-1.5 flex items-center gap-1">
+        <span>마이크 버튼을 누르면 음성으로 입력 가능합니다.</span>
+      </p>
 
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
         <div className="relative w-full max-w-sm">

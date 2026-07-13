@@ -10,6 +10,8 @@ interface AppState {
   departments: Department[];
   favorites: string[]; // employee ids
   syncUrl: string;
+  isDarkMode: boolean;
+  toggleDarkMode: () => void;
   setSyncUrl: (url: string) => void;
   syncFromUrl: () => Promise<boolean>;
   login: (password: string) => boolean;
@@ -27,7 +29,18 @@ export const useStore = create<AppState>()(
       departments: [],
       favorites: [],
       syncUrl: "",
+      isDarkMode: false,
       
+      toggleDarkMode: () => set((state) => {
+        const nextState = !state.isDarkMode;
+        if (nextState) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+        return { isDarkMode: nextState };
+      }),
+
       setSyncUrl: (url) => set({ syncUrl: url }),
       
       syncFromUrl: async () => {
@@ -150,9 +163,19 @@ export const useStore = create<AppState>()(
     }),
     {
       name: "org-chart-storage",
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          if (state.isDarkMode) {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
+        }
+      },
       partialize: (state) => ({ 
         isAuthenticated: state.isAuthenticated, 
         favorites: state.favorites,
+        isDarkMode: state.isDarkMode,
         departments: state.departments.length > 0 ? state.departments : undefined 
       }),
     }

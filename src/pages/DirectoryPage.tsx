@@ -149,13 +149,13 @@ export default function DirectoryPage() {
   return (
     <div className="p-4 md:p-8 max-w-[1600px] mx-auto w-full">
       <div className="mb-8">
-        <h1 className="text-2xl md:text-3xl font-bold text-slate-800 mb-2">통합 조직도</h1>
-        <p className="text-slate-500">부서, 이름, 업무 등을 검색해보세요. 초성 검색도 지원합니다.</p>
+        <h1 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-slate-100 mb-2">통합 조직도</h1>
+        <p className="text-slate-500 dark:text-slate-400">부서, 이름, 업무 등을 검색해보세요. 초성 검색도 지원합니다.</p>
       </div>
 
       <div className="relative mb-6 max-w-2xl">
         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-          <Search className="h-5 w-5 text-slate-400" />
+          <Search className="h-5 w-5 text-slate-400 dark:text-slate-500" />
         </div>
         <input
           type="text"
@@ -166,12 +166,12 @@ export default function DirectoryPage() {
           autoCorrect="off"
           autoCapitalize="off"
           autoComplete="off"
-          className="block w-full pl-11 pr-12 py-4 bg-white border border-slate-200 rounded-2xl shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-shadow text-lg"
+          className="block w-full pl-11 pr-12 py-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-shadow text-lg text-slate-800 dark:text-slate-100"
         />
         <button
           onClick={handleVoiceSearch}
           className={`absolute inset-y-0 right-2 my-auto h-10 w-10 flex items-center justify-center rounded-xl transition-colors ${
-            isListening ? "bg-red-50 text-red-500" : "bg-slate-50 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+            isListening ? "bg-red-50 dark:bg-red-900/30 text-red-500" : "bg-slate-50 dark:bg-slate-800/40 text-slate-400 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-600 dark:hover:text-slate-300"
           }`}
         >
           {isListening ? <MicOff className="h-5 w-5 animate-pulse" /> : <Mic className="h-5 w-5" />}
@@ -183,7 +183,7 @@ export default function DirectoryPage() {
           <select
             value={selectedOrg}
             onChange={(e) => scrollToOrg(e.target.value)}
-            className="w-full appearance-none bg-white border border-slate-200 text-slate-700 py-2.5 px-4 pr-10 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 font-medium"
+            className="w-full appearance-none bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 py-2.5 px-4 pr-10 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 font-medium"
           >
             {orgNames.map((org) => (
               <option key={org} value={org}>
@@ -191,22 +191,22 @@ export default function DirectoryPage() {
               </option>
             ))}
           </select>
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500 dark:text-slate-400">
             <ChevronDown className="h-4 w-4" />
           </div>
         </div>
 
-        <div className="flex bg-slate-100 p-1 rounded-xl shrink-0">
+        <div className="flex bg-slate-100 dark:bg-slate-700 p-1 rounded-xl shrink-0">
           <button
             onClick={() => setViewMode('accordion')}
-            className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${viewMode === 'accordion' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+            className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${viewMode === 'accordion' ? 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-300'}`}
           >
             <LayoutGrid className="w-4 h-4" />
             카드 뷰
           </button>
           <button
             onClick={() => setViewMode('tree')}
-            className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${viewMode === 'tree' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+            className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${viewMode === 'tree' ? 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-300'}`}
           >
             <ListTree className="w-4 h-4" />
             트리 뷰
@@ -233,16 +233,16 @@ export default function DirectoryPage() {
               <div key={org} id={`org-${org}`} className="scroll-mt-[140px]">
                 <button
                   onClick={toggleExpand}
-                  className="w-full flex items-center justify-between text-left p-4 mb-6 bg-white rounded-xl border border-slate-200 shadow-sm hover:border-teal-300 transition-all group"
+                  className="w-full flex items-center justify-between text-left p-4 mb-6 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm hover:border-teal-300 dark:hover:border-teal-700 transition-all group"
                 >
                   <div className="flex items-center gap-3">
-                    <h2 className="text-xl font-bold text-slate-800">{org}</h2>
-                    <span className="bg-teal-50 text-teal-600 px-3 py-1 rounded-full text-sm font-medium">
+                    <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">{org}</h2>
+                    <span className="bg-teal-50 dark:bg-teal-900/30 text-teal-600 px-3 py-1 rounded-full text-sm font-medium">
                       {depts.length}개 부서
                     </span>
                   </div>
-                  <div className="p-2 rounded-full bg-slate-50 group-hover:bg-teal-50 transition-colors">
-                    {isExpanded ? <ChevronUp className="w-5 h-5 text-slate-500 group-hover:text-teal-600" /> : <ChevronDown className="w-5 h-5 text-slate-500 group-hover:text-teal-600" />}
+                  <div className="p-2 rounded-full bg-slate-50 dark:bg-slate-800/40 group-hover:bg-teal-50 dark:hover:bg-teal-900/30 transition-colors">
+                    {isExpanded ? <ChevronUp className="w-5 h-5 text-slate-500 dark:text-slate-400 group-hover:text-teal-600" /> : <ChevronDown className="w-5 h-5 text-slate-500 dark:text-slate-400 group-hover:text-teal-600" />}
                   </div>
                 </button>
                 
@@ -268,8 +268,8 @@ export default function DirectoryPage() {
             );
           })
         ) : (
-          <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-slate-300">
-            <p className="text-slate-500">검색 결과가 없습니다.</p>
+          <div className="text-center py-20 bg-white dark:bg-slate-800 rounded-2xl border border-dashed border-slate-300 dark:border-slate-600">
+            <p className="text-slate-500 dark:text-slate-400">검색 결과가 없습니다.</p>
           </div>
         ))}
       </div>
@@ -281,7 +281,7 @@ export default function DirectoryPage() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
             onClick={scrollToTop}
-            className="fixed bottom-6 right-6 p-3 bg-slate-800 text-white rounded-full shadow-lg hover:bg-slate-700 transition-colors z-50 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2"
+            className="fixed bottom-6 right-6 p-3 bg-slate-800 dark:bg-slate-100 text-white dark:text-slate-900 rounded-full shadow-lg hover:bg-slate-700 transition-colors z-50 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2"
           >
             <ArrowUp className="w-5 h-5" />
           </motion.button>
@@ -302,11 +302,11 @@ export default function DirectoryPage() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto custom-scrollbar relative"
+              className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto custom-scrollbar relative"
             >
               <button
                 onClick={() => setSelectedDeptForModal(null)}
-                className="absolute top-4 right-4 p-2 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-full transition-colors z-10"
+                className="absolute top-4 right-4 p-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 dark:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-full transition-colors z-10"
               >
                 <X className="w-5 h-5" />
               </button>

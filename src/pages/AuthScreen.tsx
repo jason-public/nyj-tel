@@ -16,15 +16,15 @@ export default function AuthScreen() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-4">
-      <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 max-w-sm w-full">
-        <div className="w-12 h-12 bg-teal-50 text-teal-600 rounded-xl flex items-center justify-center mb-6 mx-auto">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-800/50 flex flex-col justify-center items-center p-4">
+      <div className="bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 max-w-sm w-full">
+        <div className="w-12 h-12 bg-teal-50 dark:bg-teal-900/30 text-teal-600 rounded-xl flex items-center justify-center mb-6 mx-auto">
           <Lock className="w-6 h-6" />
         </div>
-        <h1 className="text-2xl font-semibold text-center text-slate-800 mb-2">
+        <h1 className="text-2xl font-semibold text-center text-slate-800 dark:text-slate-100 mb-2">
           스마트 조직도
         </h1>
-        <p className="text-slate-500 text-center mb-8 text-sm">
+        <p className="text-slate-500 dark:text-slate-400 text-center mb-8 text-sm">
           접근을 위해 공통 암호를 입력해주세요.
         </p>
         
@@ -38,7 +38,7 @@ export default function AuthScreen() {
                 setError("");
               }}
               placeholder="비밀번호 입력"
-              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors"
+              className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors"
               autoFocus
             />
             {error && (
@@ -47,7 +47,7 @@ export default function AuthScreen() {
           </div>
           <button
             type="submit"
-            className="w-full bg-teal-600 hover:bg-teal-700 text-white font-medium py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
+            className="w-full bg-teal-600 hover:bg-teal-700 text-white dark:text-slate-900 font-medium py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
           >
             접속하기
             <ArrowRight className="w-4 h-4" />

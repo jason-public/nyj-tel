@@ -13,6 +13,7 @@ interface TreeNode {
 
 export default function OrgChartPage() {
   const departments = useStore((state) => state.departments);
+  const isDarkMode = useStore((state) => state.isDarkMode);
   const [zoom, setZoom] = useState(1);
   const [selectedDeptId, setSelectedDeptId] = useState<string | null>(null);
 
@@ -91,18 +92,18 @@ export default function OrgChartPage() {
   }, [departments, selectedDeptId]);
 
   return (
-    <div className="flex flex-col h-screen md:h-full bg-slate-50 overflow-hidden relative">
-      <div className="absolute top-4 left-4 z-10 bg-white/80 backdrop-blur p-4 rounded-2xl shadow-sm border border-slate-200">
-        <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+    <div className="flex flex-col h-screen md:h-full bg-slate-50 dark:bg-slate-800/50 overflow-hidden relative">
+      <div className="absolute top-4 left-4 z-10 bg-white dark:bg-slate-800/80 backdrop-blur p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
+        <h1 className="text-xl font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
           <Network className="w-5 h-5 text-teal-600" />
           조직도 마인드맵
         </h1>
-        <p className="text-xs text-slate-500 mt-1">부서를 클릭하면 상세 정보를 볼 수 있습니다.</p>
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">부서를 클릭하면 상세 정보를 볼 수 있습니다.</p>
         <div className="flex gap-2 mt-4">
-          <button onClick={() => setZoom(z => Math.min(z + 0.2, 2))} className="p-2 bg-slate-100 rounded hover:bg-slate-200 text-slate-600">
+          <button onClick={() => setZoom(z => Math.min(z + 0.2, 2))} className="p-2 bg-slate-100 dark:bg-slate-700 rounded hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-400">
             <ZoomIn className="w-4 h-4" />
           </button>
-          <button onClick={() => setZoom(z => Math.max(z - 0.2, 0.4))} className="p-2 bg-slate-100 rounded hover:bg-slate-200 text-slate-600">
+          <button onClick={() => setZoom(z => Math.max(z - 0.2, 0.4))} className="p-2 bg-slate-100 dark:bg-slate-700 rounded hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-400">
             <ZoomOut className="w-4 h-4" />
           </button>
         </div>
@@ -158,9 +159,9 @@ export default function OrgChartPage() {
                       width={nodeWidth}
                       height={32}
                       rx={6}
-                      fill={isRoot ? "#0d9488" : isLeaf ? "#ffffff" : "#f1f5f9"}
-                      stroke={isRoot ? "#0d9488" : isLeaf ? "#94a3b8" : "#cbd5e1"}
-                      strokeWidth={isLeaf ? 1 : 0}
+                      fill={isRoot ? "#0d9488" : isLeaf ? (isDarkMode ? "#1e293b" : "#ffffff") : (isDarkMode ? "#334155" : "#f1f5f9")}
+                      stroke={isRoot ? "#0d9488" : isLeaf ? (isDarkMode ? "#475569" : "#94a3b8") : (isDarkMode ? "#475569" : "#cbd5e1")}
+                      strokeWidth={1}
                       className={isLeaf ? "shadow-sm" : ""}
                       style={{ transition: "all 0.2s" }}
                     />
@@ -168,7 +169,7 @@ export default function OrgChartPage() {
                       dy="0.32em"
                       x={nodeWidth / 2}
                       textAnchor="middle"
-                      fill={isRoot ? "#ffffff" : "#334155"}
+                      fill={isRoot ? "#ffffff" : (isDarkMode ? "#e2e8f0" : "#334155")}
                       fontSize={isRoot ? "14px" : "13px"}
                       fontWeight={isRoot ? "bold" : "500"}
                       className="pointer-events-none"
@@ -190,11 +191,11 @@ export default function OrgChartPage() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-2xl max-h-[90vh] overflow-y-auto custom-scrollbar relative bg-white rounded-2xl shadow-xl"
+              className="w-full max-w-2xl max-h-[90vh] overflow-y-auto custom-scrollbar relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl"
             >
               <button
                 onClick={() => setSelectedDeptId(null)}
-                className="absolute top-4 right-4 p-2 bg-slate-100 text-slate-500 hover:text-slate-700 hover:bg-slate-200 rounded-full z-10 transition-colors"
+                className="absolute top-4 right-4 p-2 bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 dark:bg-slate-700 rounded-full z-10 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>

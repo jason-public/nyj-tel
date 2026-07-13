@@ -63,32 +63,32 @@ END:VCARD`;
     const formattedExt = emp.ext ? (/^\d{4}$/.test(emp.ext) ? `031-590-${emp.ext}` : emp.ext) : "";
 
     return (
-      <div className="flex items-center justify-between p-4 bg-slate-50/50 rounded-xl border border-slate-100 hover:border-teal-100 transition-colors group">
+      <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-100 dark:border-slate-700 hover:border-teal-100 dark:hover:border-teal-800 transition-colors group">
         <div className="flex-1 min-w-0">
           <div className="flex flex-wrap items-center gap-2 mb-1">
-            <span className="font-semibold text-slate-800 text-lg whitespace-nowrap">{emp.name}</span>
-            <span className="text-xs px-2 py-0.5 bg-slate-200 text-slate-600 rounded-md whitespace-nowrap">
+            <span className="font-semibold text-slate-800 dark:text-slate-100 text-lg whitespace-nowrap">{emp.name}</span>
+            <span className="text-xs px-2 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400 rounded-md whitespace-nowrap">
               {emp.rank}
             </span>
             {emp.teamName && (
-              <span className="text-xs px-2 py-0.5 bg-teal-50 text-teal-600 rounded-md break-keep">
+              <span className="text-xs px-2 py-0.5 bg-teal-50 dark:bg-teal-900/30 text-teal-600 rounded-md break-keep">
                 {emp.teamName}
               </span>
             )}
           </div>
-          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-sm text-slate-500 mt-1">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-sm text-slate-500 dark:text-slate-400 mt-1">
             <div className="flex items-center gap-1.5 whitespace-nowrap">
-              <span className="text-[11px] sm:text-xs bg-slate-200 px-1.5 py-0.5 rounded shrink-0">내선</span>
+              <span className="text-[11px] sm:text-xs bg-slate-200 dark:bg-slate-700 px-1.5 py-0.5 rounded shrink-0">내선</span>
               {formattedExt ? (
-                <a href={`tel:${formattedExt.replace(/-/g, '')}`} className="text-xs sm:text-sm truncate text-teal-600 hover:underline">{formattedExt}</a>
+                <a href={`tel:${formattedExt.replace(/-/g, '')}`} className="text-xs sm:text-sm truncate text-teal-600 dark:text-teal-400 hover:underline">{formattedExt}</a>
               ) : (
                 <span className="text-xs sm:text-sm truncate">-</span>
               )}
             </div>
             <div className="flex items-center gap-1.5 whitespace-nowrap">
-              <span className="text-[11px] sm:text-xs bg-slate-200 px-1.5 py-0.5 rounded shrink-0">모바일</span>
+              <span className="text-[11px] sm:text-xs bg-slate-200 dark:bg-slate-700 px-1.5 py-0.5 rounded shrink-0">모바일</span>
               {emp.phone ? (
-                <a href={`tel:${emp.phone}`} className="text-xs sm:text-sm truncate text-teal-600 hover:underline">{emp.phone}</a>
+                <a href={`tel:${emp.phone}`} className="text-xs sm:text-sm truncate text-teal-600 dark:text-teal-400 hover:underline">{emp.phone}</a>
               ) : (
                 <span className="text-xs sm:text-sm truncate">-</span>
               )}
@@ -98,7 +98,7 @@ END:VCARD`;
         <div className="flex items-center gap-2 ml-4">
           <button
             onClick={() => handlePhoneClick(emp.phone)}
-            className="w-10 h-10 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center hover:bg-teal-100 transition-colors"
+            className="w-10 h-10 rounded-full bg-teal-50 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400 flex items-center justify-center hover:bg-teal-100 dark:hover:bg-teal-900/50 transition-colors"
           >
             <Phone className="w-4 h-4" />
           </button>
@@ -106,16 +106,16 @@ END:VCARD`;
             onClick={() => toggleFavorite(emp.id)}
             className={cn(
               "w-10 h-10 rounded-full flex items-center justify-center transition-colors",
-              isFav ? "bg-amber-50 text-amber-500" : "bg-slate-50 text-slate-400 hover:bg-slate-100"
+              isFav ? "bg-amber-50 text-amber-500" : "bg-slate-50 dark:bg-slate-800/50 text-slate-400 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
             )}
           >
             <Star className={cn("w-4 h-4", isFav && "fill-current")} />
           </button>
-          <div className="hidden sm:flex items-center gap-2 border-l border-slate-200 pl-2 ml-2">
-            <button onClick={() => handleShare(emp)} className="w-8 h-8 rounded flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100">
+          <div className="hidden sm:flex items-center gap-2 border-l border-slate-200 dark:border-slate-700 pl-2 ml-2">
+            <button onClick={() => handleShare(emp)} className="w-8 h-8 rounded flex items-center justify-center text-slate-400 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
               <Share2 className="w-4 h-4" />
             </button>
-            <button onClick={() => handleVCard(emp)} className="w-8 h-8 rounded flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100">
+            <button onClick={() => handleVCard(emp)} className="w-8 h-8 rounded flex items-center justify-center text-slate-400 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
               <Download className="w-4 h-4" />
             </button>
           </div>
@@ -126,10 +126,10 @@ END:VCARD`;
 
   return (
     <>
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-        <div className="px-6 py-5 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white">
-          <p className="text-xs font-medium text-teal-600 mb-1">{department.orgName}</p>
-          <h2 className="text-xl font-bold text-slate-800">{department.deptName}</h2>
+      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+        <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-700 bg-gradient-to-r from-slate-50 to-white dark:from-slate-800 dark:to-slate-800">
+          <p className="text-xs font-medium text-teal-600 dark:text-teal-400 mb-1">{department.orgName}</p>
+          <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">{department.deptName}</h2>
         </div>
 
         <div className="p-4">
@@ -139,7 +139,7 @@ END:VCARD`;
             ) : null}
             
             {!department.head && department.teams.length === 0 && (
-              <div className="text-center py-8 text-slate-400 text-sm">정보가 없습니다.</div>
+              <div className="text-center py-8 text-slate-400 dark:text-slate-500 text-sm">정보가 없습니다.</div>
             )}
             
             {department.teams.length > 0 && (
@@ -152,7 +152,7 @@ END:VCARD`;
               ) : (
                 <button
                   onClick={() => setIsTeamPopupOpen(true)}
-                  className="w-full mt-3 flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-teal-600 bg-teal-50 rounded-lg hover:bg-teal-100 transition-colors"
+                  className="w-full mt-3 flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-teal-600 bg-teal-50 dark:bg-teal-900/30 rounded-lg hover:bg-teal-100 transition-colors"
                 >
                   <List className="w-4 h-4" />
                   팀장 목록 보기
@@ -171,20 +171,20 @@ END:VCARD`;
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white rounded-2xl p-6 shadow-xl max-w-sm w-full"
+              className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-xl max-w-sm w-full"
             >
               <div className="flex justify-between items-center mb-6">
-                <h3 className="font-semibold text-slate-800">전화 걸기</h3>
-                <button onClick={() => setQrPhone(null)} className="text-slate-400 hover:text-slate-600">
+                <h3 className="font-semibold text-slate-800 dark:text-slate-100">전화 걸기</h3>
+                <button onClick={() => setQrPhone(null)} className="text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:text-slate-400">
                   <X className="w-5 h-5" />
                 </button>
               </div>
-              <div className="flex flex-col items-center justify-center p-4 bg-slate-50 rounded-xl border border-slate-100">
+              <div className="flex flex-col items-center justify-center p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700">
                 <QRCodeSVG value={`tel:${qrPhone}`} size={180} level="M" />
-                <p className="mt-4 text-sm text-slate-500 text-center">
+                <p className="mt-4 text-sm text-slate-500 dark:text-slate-400 text-center">
                   스마트폰 카메라로 QR코드를 스캔하여<br />전화를 걸 수 있습니다.
                 </p>
-                <div className="mt-4 font-mono font-medium text-slate-700 bg-white px-4 py-2 rounded-lg border border-slate-200">
+                <div className="mt-4 font-mono font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700">
                   {qrPhone}
                 </div>
               </div>
@@ -200,14 +200,14 @@ END:VCARD`;
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white rounded-2xl shadow-xl max-w-lg w-full max-h-[80vh] flex flex-col"
+              className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-lg w-full max-h-[80vh] flex flex-col"
             >
-              <div className="flex justify-between items-center p-5 border-b border-slate-100">
-                <h3 className="font-semibold text-slate-800 text-lg flex items-center gap-2">
+              <div className="flex justify-between items-center p-5 border-b border-slate-100 dark:border-slate-700">
+                <h3 className="font-semibold text-slate-800 dark:text-slate-100 text-lg flex items-center gap-2">
                   <List className="w-5 h-5 text-teal-600" />
                   {department.deptName} 팀장 목록
                 </h3>
-                <button onClick={() => setIsTeamPopupOpen(false)} className="text-slate-400 hover:text-slate-600 p-1 rounded-full hover:bg-slate-100 transition-colors">
+                <button onClick={() => setIsTeamPopupOpen(false)} className="text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:text-slate-400 p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 dark:bg-slate-700 transition-colors">
                   <X className="w-5 h-5" />
                 </button>
               </div>
@@ -217,7 +217,7 @@ END:VCARD`;
                     team.leader ? <EmployeeRow key={idx} emp={team.leader} /> : null
                   )
                 ) : (
-                  <div className="text-center py-8 text-slate-400 text-sm">팀장 정보가 없습니다.</div>
+                  <div className="text-center py-8 text-slate-400 dark:text-slate-500 text-sm">팀장 정보가 없습니다.</div>
                 )}
               </div>
             </motion.div>

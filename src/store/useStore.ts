@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { Department, Employee, Team } from "../types";
-import { initialCsvData } from "../data/initialData";
+import { initialCsvData, INITIAL_DATA_VERSION } from "../data/initialData";
 import { generateId } from "../lib/utils";
 
 interface AppState {
@@ -11,6 +11,7 @@ interface AppState {
   favorites: string[]; // employee ids
   syncUrl: string;
   isDarkMode: boolean;
+  dataVersion?: string;
   toggleDarkMode: () => void;
   setSyncUrl: (url: string) => void;
   syncFromUrl: () => Promise<boolean>;
@@ -30,6 +31,7 @@ export const useStore = create<AppState>()(
       favorites: [],
       syncUrl: "",
       isDarkMode: false,
+      dataVersion: "v1",
       
       toggleDarkMode: () => set((state) => {
         const nextState = !state.isDarkMode;
@@ -99,23 +101,47 @@ export const useStore = create<AppState>()(
         const deptMap = new Map<string, Department>();
 
         dataLines.forEach(line => {
-          // simple csv split (handles quotes if needed, but our data is simple)
-          const cols = line.split(",").map(c => c.trim().replace(/\\t/g, ''));
+          // Robustly split by comma and remove surrounding quotes/spaces/tabs
+          const cols = line.split(",").map(c => c.replace(/^["'\s\t]+|["'\s\t]+$/g, '').trim());
           if (cols.length < 10) return;
           
           if (cols[0]) currentOrg = cols[0];
-          if (cols[1]) currentDeptName = cols[1];
-          if (cols[2]) currentHeadRank = cols[2];
-          if (cols[3]) currentHeadName = cols[3];
-          if (cols[4]) currentHeadExt = cols[4];
-          if (cols[5]) currentHeadPhone = cols[5];
           
-          const teamName = cols[6];
-          const leaderName = cols[7];
-          const leaderExt = cols[8];
-          const leaderPhone = cols[9];
+          if (cols[1]) {
+            currentDeptName = cols[1];
+            // Reset head info when a new department starts to prevent leaking from previous departments
+            currentHeadRank = cols[2] || "";
+            currentHeadName = cols[3] || "";
+            currentHeadExt = cols[4] || "";
+            currentHeadPhone = cols[5] || "";
+          } else {
+            // Subsequent rows of the same department
+            if (cols[2]) currentHeadRank = cols[2];
+            if (cols[3]) currentHeadName = cols[3];
+            if (cols[4]) currentHeadExt = cols[4];
+            if (cols[5]) currentHeadPhone = cols[5];
+          }
+          
+          let teamName = "";
+          let leaderName = "";
+          let leaderExt = "";
+          let leaderPhone = "";
 
-          let dept = deptMap.get(currentDeptName);
+          if (cols[6]) {
+            teamName = cols[6];
+            leaderName = cols[7] || "";
+            leaderExt = cols[8] || "";
+            leaderPhone = cols[9] || "";
+          } else if (cols[7]) {
+            teamName = cols[7];
+            leaderName = cols[8] || "";
+            leaderExt = cols[9] || "";
+            leaderPhone = cols[10] || "";
+          }
+
+          // Use composite key (org + dept) to prevent merging identical department names across different organizations
+          const deptKey = `${currentOrg}_${currentDeptName}`;
+          let dept = deptMap.get(deptKey);
           if (!dept) {
             let head: Employee | null = null;
             if (currentHeadName && currentHeadName !== "-") {
@@ -137,7 +163,7 @@ export const useStore = create<AppState>()(
               head,
               teams: []
             };
-            deptMap.set(currentDeptName, dept);
+            deptMap.set(deptKey, dept);
           }
           
           if (teamName && leaderName) {
@@ -176,13 +202,16 @@ export const useStore = create<AppState>()(
         isAuthenticated: state.isAuthenticated, 
         favorites: state.favorites,
         isDarkMode: state.isDarkMode,
-        departments: state.departments.length > 0 ? state.departments : undefined 
+        departments: state.departments.length > 0 ? state.departments : undefined,
+        dataVersion: state.dataVersion
       }),
     }
   )
 );
 
 // Call once on load just in case
-if (useStore.getState().departments.length === 0) {
+const currentVersion = useStore.getState().dataVersion;
+if (useStore.getState().departments.length === 0 || currentVersion !== INITIAL_DATA_VERSION) {
   useStore.getState().loadData(initialCsvData);
+  useStore.setState({ dataVersion: INITIAL_DATA_VERSION });
 }

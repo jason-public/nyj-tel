@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import { Star, Share2, Download, Phone, X, LayoutGrid, List } from "lucide-react";
+import { Star, Share2, Download, Phone, X, LayoutGrid, List, QrCode } from "lucide-react";
 import { Department, Employee } from "../types";
 import { useStore } from "../store/useStore";
 import { cn, isMobile } from "../lib/utils";
@@ -14,9 +14,22 @@ interface ContactCardProps {
 export default function ContactCard({ department, isSearch }: ContactCardProps) {
   const [isTeamPopupOpen, setIsTeamPopupOpen] = useState(false);
   const [qrPhone, setQrPhone] = useState<string | null>(null);
+  const [qrContact, setQrContact] = useState<Employee | null>(null);
   
   const favorites = useStore((state) => state.favorites);
   const toggleFavorite = useStore((state) => state.toggleFavorite);
+
+  const getVCardData = (emp: Employee) => {
+    const formattedExt = emp.ext ? (/^\d{4}$/.test(emp.ext) ? `031-590-${emp.ext}` : emp.ext) : "";
+    return `BEGIN:VCARD
+VERSION:3.0
+FN:${emp.name}
+ORG:${emp.orgName} ${emp.departmentName}${emp.teamName ? ` ${emp.teamName}` : ""};
+TITLE:${emp.rank}
+TEL;TYPE=WORK,VOICE:${formattedExt}
+TEL;TYPE=CELL,VOICE:${emp.phone}
+END:VCARD`;
+  };
 
   const handlePhoneClick = (phone: string) => {
     if (isMobile()) {
@@ -63,60 +76,95 @@ END:VCARD`;
     const formattedExt = emp.ext ? (/^\d{4}$/.test(emp.ext) ? `031-590-${emp.ext}` : emp.ext) : "";
 
     return (
-      <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-100 dark:border-slate-700 hover:border-teal-100 dark:hover:border-teal-800 transition-colors group">
-        <div className="flex-1 min-w-0">
-          <div className="flex flex-wrap items-center gap-2 mb-1">
-            <span className="font-semibold text-slate-800 dark:text-slate-100 text-lg whitespace-nowrap">{emp.name}</span>
-            <span className="text-xs px-2 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400 rounded-md whitespace-nowrap">
+      <div className="flex flex-col p-4 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-100 dark:border-slate-700 hover:border-teal-100 dark:hover:border-teal-800 transition-colors group">
+        <div className="w-full">
+          <div className="flex flex-wrap items-center gap-1.5 mb-1.5">
+            <span className="font-semibold text-slate-800 dark:text-slate-100 text-base md:text-lg whitespace-nowrap shrink-0" title={emp.name}>{emp.name}</span>
+            <span className="text-[11px] px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400 rounded-md whitespace-nowrap shrink-0">
               {emp.rank}
             </span>
             {emp.teamName && (
-              <span className="text-xs px-2 py-0.5 bg-teal-50 dark:bg-teal-900/30 text-teal-600 rounded-md break-keep">
+              <span className="text-[11px] px-1.5 py-0.5 bg-teal-50 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400 rounded break-keep shrink-0">
                 {emp.teamName}
               </span>
             )}
           </div>
-          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-sm text-slate-500 dark:text-slate-400 mt-1">
-            <div className="flex items-center gap-1.5 whitespace-nowrap">
-              <span className="text-[11px] sm:text-xs bg-slate-200 dark:bg-slate-700 px-1.5 py-0.5 rounded shrink-0">내선</span>
+          <div className="flex flex-col gap-1.5 text-xs text-slate-500 dark:text-slate-400 mt-2">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-semibold bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-1.5 py-0.5 rounded shrink-0">내선</span>
               {formattedExt ? (
-                <a href={`tel:${formattedExt.replace(/-/g, '')}`} className="text-xs sm:text-sm truncate text-teal-600 dark:text-teal-400 hover:underline">{formattedExt}</a>
+                <button
+                  onClick={() => handlePhoneClick(formattedExt)}
+                  className="text-xs text-teal-600 dark:text-teal-400 hover:underline hover:text-teal-700 dark:hover:text-teal-300 font-mono text-left cursor-pointer focus:outline-none shrink-0"
+                  title={`${formattedExt} (클릭하여 전화걸기)`}
+                >
+                  {formattedExt}
+                </button>
               ) : (
-                <span className="text-xs sm:text-sm truncate">-</span>
+                <span className="text-xs text-slate-400 shrink-0">-</span>
               )}
             </div>
-            <div className="flex items-center gap-1.5 whitespace-nowrap">
-              <span className="text-[11px] sm:text-xs bg-slate-200 dark:bg-slate-700 px-1.5 py-0.5 rounded shrink-0">모바일</span>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-semibold bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-1.5 py-0.5 rounded shrink-0">모바일</span>
               {emp.phone ? (
-                <a href={`tel:${emp.phone}`} className="text-xs sm:text-sm truncate text-teal-600 dark:text-teal-400 hover:underline">{emp.phone}</a>
+                <button
+                  onClick={() => handlePhoneClick(emp.phone)}
+                  className="text-xs text-teal-600 dark:text-teal-400 hover:underline hover:text-teal-700 dark:hover:text-teal-300 font-mono text-left cursor-pointer focus:outline-none shrink-0"
+                  title={`${emp.phone} (클릭하여 전화걸기)`}
+                >
+                  {emp.phone}
+                </button>
               ) : (
-                <span className="text-xs sm:text-sm truncate">-</span>
+                <span className="text-xs text-slate-400 shrink-0">-</span>
               )}
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-2 ml-4">
+        <div className="flex flex-wrap items-center gap-1 sm:gap-1.5 mt-3 pt-2 w-full justify-start border-t border-slate-100 dark:border-slate-700/60">
           <button
-            onClick={() => handlePhoneClick(emp.phone)}
-            className="w-10 h-10 rounded-full bg-teal-50 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400 flex items-center justify-center hover:bg-teal-100 dark:hover:bg-teal-900/50 transition-colors"
+            onClick={() => handlePhoneClick(emp.phone || formattedExt)}
+            disabled={!emp.phone && !formattedExt}
+            className={cn(
+              "w-6.5 h-6.5 sm:w-7.5 sm:h-7.5 rounded-full flex items-center justify-center transition-colors shrink-0 cursor-pointer focus:outline-none",
+              (!emp.phone && !formattedExt)
+                ? "bg-slate-100 dark:bg-slate-800 text-slate-300 dark:text-slate-600 cursor-not-allowed"
+                : "bg-teal-50 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400 hover:bg-teal-100 dark:hover:bg-teal-900/50"
+            )}
+            title="전화 걸기"
           >
-            <Phone className="w-4 h-4" />
+            <Phone className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
           </button>
           <button
             onClick={() => toggleFavorite(emp.id)}
             className={cn(
-              "w-10 h-10 rounded-full flex items-center justify-center transition-colors",
-              isFav ? "bg-amber-50 text-amber-500" : "bg-slate-50 dark:bg-slate-800/50 text-slate-400 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
+              "w-6.5 h-6.5 sm:w-7.5 sm:h-7.5 rounded-full flex items-center justify-center transition-colors shrink-0 cursor-pointer focus:outline-none",
+              isFav ? "bg-amber-50 dark:bg-amber-900/20 text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-950/40" : "bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
             )}
+            title="즐겨찾기"
           >
-            <Star className={cn("w-4 h-4", isFav && "fill-current")} />
+            <Star className={cn("w-2.5 h-2.5 sm:w-3 sm:h-3", isFav && "fill-current")} />
           </button>
-          <div className="hidden sm:flex items-center gap-2 border-l border-slate-200 dark:border-slate-700 pl-2 ml-2">
-            <button onClick={() => handleShare(emp)} className="w-8 h-8 rounded flex items-center justify-center text-slate-400 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
-              <Share2 className="w-4 h-4" />
+          <button
+            onClick={() => setQrContact(emp)}
+            className="w-6.5 h-6.5 sm:w-7.5 sm:h-7.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-600 dark:hover:text-slate-200 flex items-center justify-center transition-colors shrink-0 cursor-pointer focus:outline-none"
+            title="연락처 QR코드"
+          >
+            <QrCode className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+          </button>
+          <div className="flex items-center gap-1 sm:gap-1.5 border-l border-slate-200 dark:border-slate-700 pl-1 sm:pl-1.5 ml-1 sm:ml-1.5 shrink-0">
+            <button 
+              onClick={() => handleShare(emp)} 
+              className="w-6.5 h-6.5 sm:w-7.5 sm:h-7.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-600 dark:hover:text-slate-200 flex items-center justify-center transition-colors shrink-0 cursor-pointer focus:outline-none" 
+              title="공유"
+            >
+              <Share2 className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
             </button>
-            <button onClick={() => handleVCard(emp)} className="w-8 h-8 rounded flex items-center justify-center text-slate-400 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
-              <Download className="w-4 h-4" />
+            <button 
+              onClick={() => handleVCard(emp)} 
+              className="w-6.5 h-6.5 sm:w-7.5 sm:h-7.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-600 dark:hover:text-slate-200 flex items-center justify-center transition-colors shrink-0 cursor-pointer focus:outline-none" 
+              title="다운로드"
+            >
+              <Download className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
             </button>
           </div>
         </div>
@@ -192,6 +240,65 @@ END:VCARD`;
           </div>
         )}
       </AnimatePresence>
+
+      {/* Contact Details QR Modal */}
+      <AnimatePresence>
+        {qrContact && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm" onClick={() => setQrContact(null)}>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-xl max-w-sm w-full relative"
+            >
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="font-bold text-slate-800 dark:text-slate-100 text-lg flex items-center gap-2">
+                  <QrCode className="w-5 h-5 text-teal-600" />
+                  연락처 QR코드
+                </h3>
+                <button onClick={() => setQrContact(null)} className="text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="text-center mb-4 pb-4 border-b border-slate-100 dark:border-slate-700">
+                <p className="text-xs text-teal-600 dark:text-teal-400 font-medium mb-0.5">{qrContact.orgName} • {qrContact.departmentName}</p>
+                <h4 className="text-lg font-bold text-slate-800 dark:text-slate-100">
+                  {qrContact.name} <span className="text-sm font-normal text-slate-500 dark:text-slate-400">{qrContact.rank}</span>
+                </h4>
+                {qrContact.teamName && (
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{qrContact.teamName}</p>
+                )}
+              </div>
+
+              <div className="flex flex-col items-center justify-center p-5 bg-slate-50 dark:bg-slate-900/30 rounded-xl border border-slate-100 dark:border-slate-700/50">
+                <div className="p-4 bg-white rounded-xl shadow-inner flex items-center justify-center">
+                  <QRCodeSVG value={getVCardData(qrContact)} size={180} level="M" />
+                </div>
+                <p className="mt-4 text-xs text-slate-500 dark:text-slate-400 text-center leading-relaxed">
+                  휴대폰 카메라로 QR코드를 스캔하면<br />
+                  <span className="font-semibold text-teal-600 dark:text-teal-400">연락처에 자동으로 저장</span>할 수 있습니다.
+                </p>
+              </div>
+
+              <div className="mt-4 flex gap-2">
+                <button
+                  onClick={() => {
+                    handleVCard(qrContact);
+                    setQrContact(null);
+                  }}
+                  className="flex-1 py-2.5 px-4 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-xl text-sm transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <Download className="w-4 h-4" />
+                  연락처 파일 저장
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
       {/* Team Leaders Modal */}
       <AnimatePresence>
         {isTeamPopupOpen && (

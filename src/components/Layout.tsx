@@ -1,7 +1,6 @@
 import { Outlet, NavLink } from "react-router-dom";
 import { Users, Star, ListTree, Settings, Building2, Sun, Moon } from "lucide-react";
 import { useStore } from "../store/useStore";
-import GlobalSearch from "./GlobalSearch";
 
 export default function Layout() {
   const { isDarkMode, toggleDarkMode } = useStore();
@@ -23,9 +22,6 @@ export default function Layout() {
             </div>
             <h1 className="font-semibold text-slate-800 dark:text-slate-100 text-lg">스마트조직도</h1>
           </div>
-        </div>
-        <div className="p-4 border-b border-slate-100 dark:border-slate-700">
-          <GlobalSearch />
         </div>
         
         <nav className="p-4 space-y-1 flex-1">
@@ -61,9 +57,12 @@ export default function Layout() {
       {/* Main Content */}
       <main className="flex-1 md:ml-64 pb-20 md:pb-0 relative min-h-screen flex flex-col">
         {/* Mobile Header */}
-        <div className="md:hidden sticky top-0 z-40 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-700 p-4 flex items-center gap-3">
-          <div className="flex-1">
-            <GlobalSearch />
+        <div className="md:hidden sticky top-0 z-40 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-700 p-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="bg-teal-50 dark:bg-teal-900/30 p-2 rounded-lg text-teal-600 dark:text-teal-400">
+              <Building2 className="w-5 h-5" />
+            </div>
+            <h1 className="font-semibold text-slate-800 dark:text-slate-100 text-base">스마트조직도</h1>
           </div>
           <button
             onClick={toggleDarkMode}

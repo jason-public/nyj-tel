@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useEffect } from "react";
 import { useStore } from "./store/useStore";
+import { initialCsvData } from "./data/initialData";
 import Layout from "./components/Layout";
 import AuthScreen from "./pages/AuthScreen";
 import DirectoryPage from "./pages/DirectoryPage";
@@ -10,6 +11,16 @@ import AdminPage from "./pages/AdminPage";
 export default function App() {
   const isAuthenticated = useStore((state) => state.isAuthenticated);
   const syncFromUrl = useStore((state) => state.syncFromUrl);
+
+  useEffect(() => {
+    // Force reload with the latest initialCsvData if version is older
+    const CURRENT_CSV_VERSION = "2026-07-14-towns-reorg-v1";
+    const loadedVersion = localStorage.getItem("loaded_csv_version");
+    if (loadedVersion !== CURRENT_CSV_VERSION) {
+      useStore.getState().loadData(initialCsvData);
+      localStorage.setItem("loaded_csv_version", CURRENT_CSV_VERSION);
+    }
+  }, []);
 
   useEffect(() => {
     // Attempt to sync from URL on app load if configured

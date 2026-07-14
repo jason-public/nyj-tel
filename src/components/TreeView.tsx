@@ -94,15 +94,15 @@ function DeptNode({ dept, hasSearch, onDeptSelect }: { dept: Department; hasSear
           >
             <div className="pl-6 space-y-1 pb-2 relative before:absolute before:left-2.5 before:top-0 before:bottom-2 before:w-px before:bg-slate-200 dark:bg-slate-700">
               {dept.head && (
-                <div className="flex items-center gap-2 py-1 relative">
+                <div className="flex flex-wrap items-center gap-2 py-1 relative">
                   <div className="absolute left-[-14px] top-1/2 w-3 h-px bg-slate-200 dark:bg-slate-700" />
                   <User className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 shrink-0" />
-                  <button onClick={() => onDeptSelect(dept)} className="text-sm font-medium text-slate-800 dark:text-slate-100 hover:text-teal-600 hover:underline text-left">
+                  <button onClick={() => onDeptSelect(dept)} className="text-sm font-medium text-slate-800 dark:text-slate-100 hover:text-teal-600 hover:underline text-left cursor-pointer">
                     {dept.head.name}
                   </button>
                   <span className="text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 px-1.5 py-0.5 rounded">{dept.head.rank}</span>
-                  {dept.head.phone && <span className="text-xs text-slate-400 dark:text-slate-500 ml-auto hidden sm:inline-block">{dept.head.phone}</span>}
-                  {dept.head.ext && <span className="text-xs text-slate-400 dark:text-slate-500 ml-2 hidden sm:inline-block">내선: {dept.head.ext}</span>}
+                  {dept.head.phone && <span className="text-xs text-slate-400 dark:text-slate-500 ml-auto">{dept.head.phone}</span>}
+                  {dept.head.ext && <span className="text-xs text-slate-400 dark:text-slate-500 ml-2">내선: {dept.head.ext}</span>}
                 </div>
               )}
               {dept.teams.map((team, idx) => (
@@ -113,16 +113,20 @@ function DeptNode({ dept, hasSearch, onDeptSelect }: { dept: Department; hasSear
                     <span className="text-sm text-slate-600 dark:text-slate-400">{team.teamName}</span>
                   </div>
                   {team.leader && (
-                    <div className="flex items-center gap-2 py-1 pl-6 relative">
+                    <div className="flex flex-wrap items-center gap-2 py-1 pl-6 relative">
                       <div className="absolute left-[10px] top-0 bottom-0 w-px bg-slate-200 dark:bg-slate-700" />
                       <div className="absolute left-[10px] top-1/2 w-3 h-px bg-slate-200 dark:bg-slate-700" />
                       <User className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 shrink-0" />
-                      <button onClick={() => onDeptSelect(dept)} className="text-sm font-medium text-slate-800 dark:text-slate-100 hover:text-teal-600 hover:underline text-left">
-                        {team.leader.name}
-                      </button>
+                      {team.leader.name === "-" ? (
+                        <span className="text-sm text-slate-400 dark:text-slate-500 italic">공석</span>
+                      ) : (
+                        <button onClick={() => onDeptSelect(dept)} className="text-sm font-medium text-slate-800 dark:text-slate-100 hover:text-teal-600 hover:underline text-left cursor-pointer">
+                          {team.leader.name}
+                        </button>
+                      )}
                       <span className="text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 px-1.5 py-0.5 rounded">{team.leader.rank}</span>
-                      {team.leader.phone && <span className="text-xs text-slate-400 dark:text-slate-500 ml-auto hidden sm:inline-block">{team.leader.phone}</span>}
-                      {team.leader.ext && <span className="text-xs text-slate-400 dark:text-slate-500 ml-2 hidden sm:inline-block">내선: {team.leader.ext}</span>}
+                      {team.leader.phone && <span className="text-xs text-slate-400 dark:text-slate-500 ml-auto">{team.leader.phone}</span>}
+                      {team.leader.ext && <span className="text-xs text-slate-400 dark:text-slate-500 ml-2">내선: {team.leader.ext}</span>}
                     </div>
                   )}
                 </div>
